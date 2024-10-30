@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Image Upload</title>
+    <style>
+        #myCanvas {
+            border: 1px solid black;
+        }
+        #invisibleCanvas {
+            /* display: none;/ */
+        }
+        #uploadedImage {
+            display: none;
+        }
+        
+    </style>
+</head>
+<body>
+    <h1>Upload an Image and Draw on it</h1>
+
+    <!-- Form for uploading an image -->
+    <form action="/upload" method="POST" enctype="multipart/form-data">
+        <input type="file" name="image" accept="image/*" required>
+        <button type="submit">Upload Image</button>
+    </form>
+
+    {% if filename %}
+        <h2>Uploaded Image:</h2>
+        <!-- Hidden image tag to load the image into canvas -->
+        <img id="uploadedImage" src="{{ url_for('uploaded_file', filename=filename) }}">
+        <button onclick="draw()">Draw</button>
+        <!-- Canvas to draw on top of the image -->
+        <canvas id="myCanvas"></canvas>
+        <canvas id="invisibleCanvas"></canvas>
+        <button onclick="save()">Save</button>
+    {% endif %}
+
+    <script src="{{ url_for('static', filename='canvas.js') }}"></script>
+</body>
+</html>

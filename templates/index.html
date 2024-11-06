@@ -7,36 +7,72 @@
     <style>
         #myCanvas {
             border: 1px solid black;
+            width: 400px;
+            height: 300px
         }
         #invisibleCanvas {
             /* display: none;/ */
         }
         #uploadedImage {
-            display: none;
+            width: 400px;
+            height: 300px
         }
-        
+        #invisibleCanvas {
+            width: 400px;
+            height: 300px
+        }
+
     </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='mystyle.css') }}"
 </head>
 <body>
+  <div>
     <h1>Upload an Image and Draw on it</h1>
 
-    <!-- Form for uploading an image -->
-    <form action="/upload" method="POST" enctype="multipart/form-data">
-        <input type="file" name="image" accept="image/*" required>
-        <button type="submit">Upload Image</button>
-    </form>
 
+    <p> new form</p>
+    <form action="/upload" method="POST" enctype="multipart/form-data" id="file-upload-form" class="uploader">
+        <div style = "display: flex; flex-direction: column;">
+          <input id="file-upload" type="file" name="image" accept="image/*" />
+  
+          <label for="file-upload" id="file-drag">
+            <img id="file-image" src="#" alt="Preview" class="hidden">
+            <div id="start">
+              <i class="fa fa-download" aria-hidden="true"></i>
+              <div>Select a file or drag here</div>
+              <div id="notimage" class="hidden">Please select an image</div>
+              <span id="file-upload-btn" class="btn btn-primary">Select a file</span>
+            </div>
+            <div id="response" class="hidden">
+              <div id="messages"></div>
+              <progress class="progress" id="file-progress" value="0">
+                <span>0</span>%
+              </progress>
+            </div>
+            <div>        <button type="submit">Upload Image</button></div>
+          </label>
+        </div>
+        </form>
     {% if filename %}
-        <h2>Uploaded Image:</h2>
-        <!-- Hidden image tag to load the image into canvas -->
-        <img id="uploadedImage" src="{{ url_for('uploaded_file', filename=filename) }}">
-        <button onclick="draw()">Draw</button>
-        <!-- Canvas to draw on top of the image -->
+    <div class = "drawing-container"> 
+      <h2>Uploaded Image:</h2>
+      <!-- Hidden image tag to load the image into canvas -->
+      <img id="uploadedImage" src="{{ url_for('uploaded_file', filename=filename) }}">
+      <div>
+        <button id="btn-draw" onclick="draw()">Draw</button>
+      </div>
+      <!-- Canvas to draw on top of the image -->
+      <div id = "drawing-content" class = "hidden" >
         <canvas id="myCanvas"></canvas>
         <canvas id="invisibleCanvas"></canvas>
-        <button onclick="save()">Save</button>
+        <div> 
+          <button onclick="save()">Save</button>
+        </div>
+      </div>
+    </div>
     {% endif %}
-
+  </div>
+    
     <script src="{{ url_for('static', filename='canvas.js') }}"></script>
 </body>
 </html>

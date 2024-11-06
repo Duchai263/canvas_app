@@ -13,7 +13,7 @@ def index():
     return render_template('index.html')
 
 @app.route('/upload', methods=['POST'])
-def upload_image():
+async def upload_image():
     if 'image' not in request.files:
         return redirect(request.url)
     file = request.files['image']
@@ -43,4 +43,4 @@ def save_canvas():
     return jsonify({"filename": filename})
 
 if __name__ == '__main__':
-    app.run(debug=True, port=6969)
+    app.run(debug=True, port=8000)

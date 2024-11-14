@@ -1,27 +1,116 @@
 @import url(https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css);
  @import url('https://fonts.googleapis.com/css?family=Roboto');
- html, body, * {
-	 box-sizing: border-box;
-	 font-size: 16px;
-}
+ html, body {
+	box-sizing: border-box;
+	font-size: 16px;
+	height: 100%;
+	text-align: center;
+	margin:0;
+	display: block;
+	background-color: #f1f2f6;
 
+}
+.flex-center{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.topnav {
+	overflow: hidden;
+	padding: 20px 30px;
+	display: flex;
+  }
+  
+  .topnav a {
+	display: inline;
+	float: left;
+	color: black;
+	text-align: center;
+	padding: 14px 23px;
+	text-decoration: none;
+	font-size: 25px;
+  }
+
+.signup-container{
+	background-color: black;
+    border: 5px solid black;
+    border-radius: 10px;
+}
+  
+#signup {
+	color: wheat
+}
+  .topnav a.active {
+	font-weight:bold;
+	color: black;
+  }
+.top-nav-left-container{
+	flex: 0 0 auto;
+}
+.top-nav-right-container {
+	flex: 1;
+	display: flex;
+	justify-content: flex-end;
+	width:fit-content;
+	margin: 0 30px 0 0;
+}
+#myCanvas {
+	/* border: 1px solid black; */
+	display: inline;
+	margin: 0 auto 0.5rem auto;
+	width:0;
+	height: 0;
+	max-width: 500px;
+}
+#invisibleCanvas {
+	/* display: none;/ */
+}
+#uploadedImage {
+	display: inline;
+	margin: 0 auto 0.5rem auto;
+	width:0;
+	height: 0;
+	max-width: 500px;	
+}
+#invisibleCanvas {
+	width: 400px;
+	height: 300px
+}
 .hidden{
 	display: none;
 }
- html, body {
-	 height: 100%;
-	 text-align: center;
+
+.pen-emoji-container{
+	display: inline;
+	height: 30px;
+	width: 30px;
 }
- body {
-	 padding: 2rem;
-	 background: #f8f8f8;
+.pen-emoji{
+	height: 40px;
+	width: 40px;
+	margin: 0 10px;
 }
  h2 {
-	 font-family: "Roboto", sans-serif;
-	 font-size: 26px;
+	display: inline;
+	 font-family: "General", sans-serif;
+	 font-size: 60px;
 	 line-height: 1;
 	 color: #454cad;
 	 margin-bottom: 0;
+}
+
+h1{
+	font-size: 24px;
+}
+
+.upload-form-container{
+	display: flex;
+	flex-direction: column;
+	width:800px;
+	height: 500px;
+
+
+
 }
  p {
 	 font-family: "Roboto", sans-serif;
@@ -33,13 +122,15 @@
 	 clear: both;
 	 margin: 0 auto;
 	 width: 100%;
-	 max-width: 600px;
+	 max-width: 700px;
+	 height:400px;
+	 max-height: 500px;
 }
  .uploader label {
 	 float: left;
 	 clear: both;
 	 width: 100%;
-	 padding: 2rem 1.5rem;
+	 height: 500px;
 	 text-align: center;
 	 background: #fff;
 	 border-radius: 7px;
@@ -62,6 +153,7 @@
 	 float: left;
 	 clear: both;
 	 width: 100%;
+	 margin: 50px 0;
 }
  .uploader #start.hidden {
 	 display: none;
@@ -81,12 +173,13 @@
 }
  .uploader #response #messages {
 	 margin-bottom: 0.5rem;
+	 font-size: 20px;
 }
  .uploader #file-image {
 	 display: inline;
 	 margin: 0 auto 0.5rem auto;
-	 width: auto;
-	 height: auto;
+	 width:100%;
+	 height: 100%;
 	 max-width: 500px;
 }
  .uploader #file-image.hidden {
@@ -154,3 +247,60 @@
 	 border-color: #454cad;
 	 cursor: pointer;
 }	
+
+/* CSS */
+#submit-btn-container {
+	margin-top: 20px;
+	margin-left:20px;
+	display: flex;
+	justify-content: center;
+
+}
+.submit-btn{
+	
+	align-items: center;
+	background-image: linear-gradient(144deg,#AF40FF, #5B42F3 50%,#00DDEB);
+	border: 0;
+	border-radius: 8px;
+	box-shadow: rgba(151, 65, 252, 0.2) 0 15px 30px -5px;
+	box-sizing: border-box;
+	color: #FFFFFF;
+	display: flex;
+	font-family: Phantomsans, sans-serif;
+	font-size: 20px;
+	justify-content: center;
+	line-height: 1em;
+	max-width: 60px;
+	min-width: 40px;
+	padding: 19px 24px;
+	text-decoration: none;
+	user-select: none;
+	-webkit-user-select: none;
+	touch-action: manipulation;
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+
+.submit-btn:active,
+.submit-btn:hover {
+  outline: 0;
+}
+
+@media (min-width: 768px) {
+	.submit-btn {
+    font-size: 18px;
+    min-width: 130px;
+  }
+}
+
+#btn-draw{
+	margin:20px
+}
+.drawing-container{
+	margin-left: 130px;
+	margin-top: 30px	0px;
+}
+.draw-btn-container{
+	padding: 20px 0;
+}

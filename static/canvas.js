@@ -1,38 +1,99 @@
+let invCanvas = document.createElement('canvas');
+var link = document.createElement('a');
+
 window.onload = function () {
     var canvas = document.getElementById('myCanvas');
-    var invCanvas = document.getElementById('invisibleCanvas')
+    
     var ctx = canvas.getContext('2d');
-    var ctx2 = invCanvas.getContext('2d')
-    var img = document.getElementById('uploadedImage');
-    var painting = false;
-
     ctx.globalAlpha = 1; // Full opacity
     ctx.imageSmoothingEnabled = false; 
+    document.getElementById('btn-draw').onclick = () => {
+      upload();
+    }
+};
+let imagefile;
+
+async function upload (){
+  var img = document.getElementById('file-image')
+  var img_name = document.getElementById('message')
+  var canvas = document.getElementById('myCanvas');
+  var ctx = canvas.getContext('2d');
+
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  let canvas_img = canvas.toDataURL('image/png');
+
+  await fetch('/upload_img', {
+    method: 'POST',
+    body: JSON.stringify({ upload_img: canvas_img, name: imagefile.name}),
+    headers: {
+        'Content-Type': 'application/json'
+    }
+})
+.then(response => response.json())
+.then(data => {
+    if (data.message === 'oke')
+    {
+      // let canvas = document.getElementById("myCanvas");
+      let ctx = canvas.getContext('2d');
+
+      if (img && ctx) {
+            // Set the canvas size to match the image
+            document.getElementById('file-drag').style.height = 0; 
+            canvas.width = img.width;
+            canvas.height = img.height; 
+            canvas.style.width = "100%";
+            canvas.style.height = "100%";
+            img.style.display = 'none';
+            // Draw the image on the canvas
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            draw()
+            document.getElementById('btn-draw').textContent = "Save"
+            document.getElementById('btn-draw').onclick = () => {
+              save()
+              let img_result = document.getElementById('uploadedImage');
+              img_result.style.width = canvas.style.width;
+              img_result.style.height = canvas.style.height;
+              img_result.classList.remove("hidden");
+              canvas.style.display = "none";
+
+            }
+    }
+    }
+})
+.catch(error => {
+    console.error('Error:', error);
+});
+}
+
+function draw() {
+
+    let canvas = document.getElementById('myCanvas');
+    // invCanvas.classList.remove("hidden");
+    // // document.getElementById('drawing-content').classList.remove("hidden");
+    // // document.getElementById('btn-draw').textContent = 'Draw again'; 
+
+    let ctx = canvas.getContext('2d');
+    if (ctx) {
+        invCanvas.width = canvas.width;
+        invCanvas.height = canvas.height;
+        var ctx2 = invCanvas.getContext('2d');
+        ctx2.fillStyle='black';
+        ctx2.fillRect(0,0,canvas.width,canvas.height);
+
+    // Start painting
+
+    var painting = false;
+
 
     ctx2.globalAlpha = 1;
     ctx2.imageSmoothingEnabled = false; 
-
     // Draw the uploaded image onto the canvas once it loads
-    if (img && ctx) {
-        img.onload = function() {
-            // Set the canvas size to match the image
-            canvas.width = img.width;
-            canvas.height = img.height;
-            
-            // Draw the image on the canvas
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        };
-    }
-
-    // Start painting
     canvas.addEventListener('mousedown', async function () {
-        console.log("mouse down function")
         painting = true;
     });
 
     // Stop painting
     canvas.addEventListener('mouseup', async function () {
-        console.log("mouse up function")
         painting = false;
         ctx.beginPath(); // Reset the path after each stroke
         ctx2.beginPath();
@@ -66,39 +127,30 @@ window.onload = function () {
         ctx.moveTo(x, y);
     });
 
-};
-
-function draw() {
-    console.log("draw function")
-    var img = document.getElementById('uploadedImage');
-    var invCanvas = document.getElementById('invisibleCanvas')
-    var canvas = document.getElementById('myCanvas');
-    document.getElementById('drawing-content').classList.remove("hidden");
-    document.getElementById('btn-draw').textContent = 'Draw again';
-    var ctx = canvas.getContext('2d');
-    var ctx2 = invCanvas.getContext('2d')
-    if (img && ctx) {
-        console.log("aaa")
-        canvas.width = img.width;
-        canvas.height = img.height;
-        invCanvas.width = img.width;
-        invCanvas.height = img.height;
-
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        ctx2.fillStyle='black';
-        ctx2.fillRect(0,0,canvas.width,canvas.height);
     }
   }
 
-  function save(){
-    // var canvas = document.getElementById('myCanvas');
-    var invCanvas = document.getElementById('invisibleCanvas')
-    console.log("aaaaaaa")
-    var link = document.createElement('a');
-    link.download = 'canvas_image.png'; // The name of the downloaded file
-    // link.href = canvas.toDataURL(); // Convert canvas content to a data URL (image format)
-    link.href = invCanvas.toDataURL()
-    link.click();
+  async function save(){
+    
+    let imageData = invCanvas.toDataURL();
+
+    await fetch('/download_canvas', {
+      method: 'POST',
+      body: JSON.stringify({ image_data: imageData,name:imagefile.name }),
+      headers: {
+          'Content-Type': 'application/json'
+      }
+  })
+  .then(response => response.json())
+  .then(data => {
+      if (data.message === 'oke')
+      {
+        document.getElementById('uploadedImage').src = data.img_name;
+      }
+  })
+  .catch(error => {
+      console.error('Error:', error);
+  });
   }
 
 // image upload 
@@ -109,12 +161,12 @@ function ekUpload(){
   function Init() {
     
     //(1)
-      console.log("Upload Initialised");
   
       var fileSelect    = document.getElementById('file-upload'),
           fileDrag      = document.getElementById('file-drag'),
           submitButton  = document.getElementById('submit-button');
-  
+
+
           //(2)
       fileSelect.addEventListener('change', fileSelectHandler, false);
       // Is XHR2 available?
@@ -160,16 +212,12 @@ function ekUpload(){
     }
   //(4)
     function parseFile(file) {
-  
-      console.log(file.name);
+      imagefile = file;
       output(
         '<strong>' + encodeURI(file.name) + '</strong>'
       );
       
-      // var fileType = file.type;
-      // console.log(fileType);
       var imageName = file.name;
-      console.log(file );
   
       var isGood = (/\.(?=gif|jpg|png|jpeg)/gi).test(imageName);
       if (isGood) {
@@ -202,6 +250,7 @@ function ekUpload(){
   
       if (e.lengthComputable) {
         pBar.value = e.loaded;
+
       }
     }
   //(5)

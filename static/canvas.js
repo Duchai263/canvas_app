@@ -1,26 +1,65 @@
 let invCanvas = document.createElement('canvas');
 var link = document.createElement('a');
-
+let mode = "";
+let check_upload = 0;
+let globalheight = 0;
+let globalwidth = 0;
 window.onload = function () {
-    var canvas = document.getElementById('myCanvas');
-    
-    var ctx = canvas.getContext('2d');
-    ctx.globalAlpha = 1; // Full opacity
-    ctx.imageSmoothingEnabled = false; 
     document.getElementById('btn-draw').onclick = () => {
       upload();
     }
+    mode = "drawing";
+    document.getElementById('btn-segment').onclick = () => {
+      if (mode === "drawing")
+      {
+        var img = document.getElementById('file-image')
+        globalwidth = img.width;
+        globalheight = img.height;
+        mode = "segment";
+        let segment_mode = document.getElementById('segment-image');
+        document.getElementById("myCanvas").style.display = "none";
+        document.getElementById("detectOnClick").classList.remove('hidden');
+        segment_mode.src = document.getElementById("file-image").src;
+        segment_mode.style = document.getElementById("file-image").style;
+        segment_mode.addEventListener("click",handleClick);
+        document.getElementById('file-drag').style.pointerEvents = "none";
+        document.getElementById('file-drag').style.display = "none";
+        save_mode()
+        document.getElementById("btn-segment").textContent = "Draw Mask";
+      }
+      else if (mode === "segment")
+      {
+        if (check_upload === 1){
+          mode = "drawing";
+          document.getElementById("myCanvas").style.display = "block"
+          document.getElementById("detectOnClick").classList.add('hidden')
+        }
+        else{
+          upload();
+          document.getElementById("myCanvas").style.display = "block"
+          document.getElementById("detectOnClick").classList.add('hidden')
+        }
+        document.getElementById("btn-segment").textContent = "Segmentation";
+      }
+    }
 };
+
 let imagefile;
 
 async function upload (){
   var img = document.getElementById('file-image')
+  if (globalheight === 0)
+  {
+    globalwidth = img.width;
+    globalheight = img.height;
+  }
+  check_upload = 1;
   var img_name = document.getElementById('message')
   var canvas = document.getElementById('myCanvas');
-  var ctx = canvas.getContext('2d');
+  document.getElementById("detectOnClick").classList.add('hidden')
 
-  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-  let canvas_img = canvas.toDataURL('image/png');
+
+  let canvas_img = canvas.toDataURL();
 
   await fetch('/upload_img', {
     method: 'POST',
@@ -38,31 +77,44 @@ async function upload (){
 
       if (img && ctx) {
             // Set the canvas size to match the image
-            document.getElementById('file-drag').style.height = 0; 
-            canvas.width = img.width;
-            canvas.height = img.height; 
+            // document.getElementById('file-drag').style.height = 0; 
+            document.getElementById('file-drag').style.pointerEvents = "none";
+
             canvas.style.width = "100%";
             canvas.style.height = "100%";
+            canvas.width = globalwidth;
+            canvas.height = globalheight; 
             img.style.display = 'none';
             // Draw the image on the canvas
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
             draw()
-            document.getElementById('btn-draw').textContent = "Save"
-            document.getElementById('btn-draw').onclick = () => {
-              save()
-              let img_result = document.getElementById('uploadedImage');
-              img_result.style.width = canvas.style.width;
-              img_result.style.height = canvas.style.height;
-              img_result.classList.remove("hidden");
-              canvas.style.display = "none";
-
-            }
+            save_mode()
+            document.getElementById('file-drag').style.display = "none";
     }
     }
 })
 .catch(error => {
     console.error('Error:', error);
 });
+}
+
+function save_mode (){
+  document.getElementById('btn-draw').textContent = "Save"
+            document.getElementById('btn-draw').onclick = () => {
+              let canvas = document.getElementById("myCanvas");
+              save()
+              let img_result = document.getElementById('uploadedImage');
+              img_result.style.width = "100%";
+              img_result.style.height = "100%";
+              img_result.classList.remove("hidden");
+              if (mode === "drawing")
+              {
+                canvas.style.display = "none";
+              }
+              else if (mode === "segment"){
+                document.getElementById('detectOnClick').style.display = "none";
+              }
+            }
 }
 
 function draw() {
@@ -132,7 +184,15 @@ function draw() {
 
   async function save(){
     
-    let imageData = invCanvas.toDataURL();
+    let imageData;
+    if (mode === "drawing")
+    {
+      imageData = invCanvas.toDataURL();
+    }
+    else if (mode === "segment")
+    {
+      imageData = document.getElementById('canvas-segmentation').toDataURL()
+    }
 
     await fetch('/download_canvas', {
       method: 'POST',
@@ -304,7 +364,6 @@ function ekUpload(){
     FilesetResolver
   } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0"
   
-  const demosSection = document.getElementById("demos")
   
   let interactiveSegmenter
   
@@ -326,7 +385,6 @@ function ekUpload(){
         outputConfidenceMasks: false
       }
     )
-    demosSection.classList.remove("invisible")
   }
   createSegmenter()
   
@@ -410,7 +468,7 @@ function ekUpload(){
     const ctx = canvas.getContext("2d")
     ctx.fillStyle = "#00000000"
     ctx.fillRect(0, 0, width, height)
-    ctx.fillStyle = "rgba(18, 181, 203, 0.7)"
+    ctx.fillStyle = "rgba(0, 0, 0, 0.7)"
   
     maskData.map((category, index) => {
       if (Math.round(category * 255.0) === 0) {

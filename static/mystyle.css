@@ -63,7 +63,6 @@
 	margin: 0 auto 0.5rem auto;
 	width:0;
 	height: 0;
-	max-width: 500px;
 }
 #invisibleCanvas {
 	/* display: none;/ */
@@ -133,7 +132,7 @@ h1{
 	 float: left;
 	 clear: both;
 	 width: 100%;
-	 height: 500px;
+	 height: 100%;
 	 text-align: center;
 	 background: #fff;
 	 border-radius: 7px;
@@ -178,12 +177,11 @@ h1{
 	 margin-bottom: 0.5rem;
 	 font-size: 20px;
 }
- .uploader #file-image {
+ .uploader #file-image, #segment-image {
 	 display: inline;
 	 margin: 0 auto 0.5rem auto;
 	 width:100%;
 	 height: 100%;
-	 max-width: 500px;
 }
  .uploader #file-image.hidden {
 	 display: none;
@@ -297,7 +295,7 @@ h1{
   }
 }
 
-#btn-draw{
+#btn-draw, #btn-segment{
 	margin:20px
 }
 .drawing-container{
@@ -321,8 +319,8 @@ section {
   .detectOnClick {
 	position: relative;
 	float: left;
-	width: 700px;
-	height: 500px;
+	width: 100%;
+	height: 100%;
 	margin: 2% 1%;	
 	cursor: pointer;
   }

@@ -44,21 +44,25 @@
           <input id="file-upload" type="file" name="image" accept="image/*" />
   
           <label for="file-upload" id="file-drag" class = "flex-center">
-
-
             <img id="file-image" src="#" alt="Preview" class="hidden">
+
+
             <div id="start">
               <i class="fa fa-download" aria-hidden="true"></i>
               <div>Select a file or drag here</div>
               <div id="notimage" class="hidden">Please select an image</div>
               <span id="file-upload-btn" class="btn btn-primary">Select a file</span>
             </div>
-
           <div> 
-
             </div>
           </label>
+          <div class="detectOnClick hidden" id="detectOnClick" >
+            <img id="segment-image" src="#" alt="Preview" class="hidden">
+            <canvas class="canvas-segmentation" id = "canvas-segmentation"></canvas>
+            <span class="click-point"></span>
+          </div>
           <canvas id="myCanvas" ></canvas>
+
           <img id="uploadedImage" class = "hidden">
           <div id="response" class="hidden">
             <div id="messages"></div>
@@ -67,54 +71,16 @@
             </progress>
           </div>
           <div id="submit-btn-container" >
-            <button id="btn-draw" class="submit-btn">Upload Image</button>
+            <button id="btn-draw" class="submit-btn">Draw Mask</button>
+            <button id="btn-segment" class="submit-btn" >Segmentation</button>
           </div>
         </div>
       </div>
     </div>
-
- 
-    {% if filename %}
-    <div class = "drawing-container"> 
-      <h1>Uploaded Image:</h1>
-      <!-- Hidden image tag to load the image into canvas -->
-      <div class="flex-center draw-btn-container">
-        <button class="submit-btn" onclick="draw()">Draw</button>
-      </div>
-      <!-- Canvas to draw on top of the image -->
-      <div id = "drawing-content"  >
-
-        <canvas id="invisibleCanvas" class = "hidden"></canvas>
-        <div> 
-          <button onclick="save()">Save</button>
-        </div>
-      </div>
-    </div>
-    {% endif %} 
   </div>
 
 
-  <div>
-    <div class="detectOnClick">
-      <img src="https://assets.codepen.io/9177687/coupledog.jpeg" width="100%" crossorigin="anonymous" title="Click to see segmentation" />
-      <canvas class="canvas-segmentation"></canvas>
-      <span class="click-point"></span>
-    </div>
-  </div>
-  <div style="top: 30px; position: relative; clear: both;">
-    <div style="margin: 5px"><b>Choose your own image</b> from local storage to detect segmentation in the image.</div>
-    <div>
-      <div class="input">
-        <button class="mdc-button mdc-button--raised" onclick="document.getElementById('uploadFile').click()">
-          <span class="mdc-button__label">SELECT IMAGE</span>
-        </button>
-        <input id="uploadFile" type="file" accept=".jpeg,.png,.jpg" style="display:none">
-      </div>
-      <div class="detectOnClick" style="  width: 80%;">
-        <img id="imageUpload" width="100%" crossorigin="anonymous" title="Click to segment image" />
-        <canvas class="canvas-segmentation"></canvas>
-        <span class="click-point"></span>
-      </div>
+
 
     
     <script type="module" src="{{ url_for('static', filename='canvas.js') }}"></script>

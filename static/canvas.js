@@ -1,3 +1,5 @@
+import {setImage ,click} from './segmentAPI.js'
+
 let invCanvas = document.createElement('canvas');
 let invCanvas_seg = document.createElement('canvas');
 let mode = "";
@@ -83,7 +85,9 @@ async function upload (){
           // Draw the image on the canvas
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
   let canvas_img = canvas.toDataURL();
-
+  ////////////////////////////////////////////////
+  // await setImage()
+  ////////////////////////////////////////////////
   await fetch('/upload_img', {
     method: 'POST',
     body: JSON.stringify({ upload_img: canvas_img, name: imagefile.name}),
@@ -302,6 +306,8 @@ function ekUpload(){
         document.getElementById('response').classList.add("hidden");
         document.getElementById("file-upload-form").reset();
       }
+
+      
     }
   
   
@@ -349,6 +355,9 @@ function ekUpload(){
         outputConfidenceMasks: false
       }
     )
+    /////////////////////////////////////////////////////
+    // await setImage()
+    /////////////////////////////////////////////////////
   }
   createSegmenter()
   
@@ -375,7 +384,9 @@ function ekUpload(){
       alert("InteractiveSegmenter still loading. Try again shortly.")
       return
     }
-    console.log (event.target)
+    ////////////////////////////////////////////////////////////
+    await click(event.offsetX / event.target.width, event.offsetY / event.target.height)
+    ////////////////////////////////////////////////////////////
     interactiveSegmenter.segment(
       event.target,
       {
@@ -439,3 +450,19 @@ function ekUpload(){
     clickPoint.style.display = "block"
   }
   
+  // async function setImage() {
+  //   const APIurl = 'http://localhost:5959/setimage/'
+
+  //   let canvas = document.getElementById('myCanvas');
+  //   let imageData = canvas.toDataURL()
+
+  //   await fetch(APIurl, {
+  //     method: 'POST',
+  //     body: JSON.stringify({ image_data: imageData, name: imagefile.name }),
+  //     headers: {
+  //         'Content-Type': 'application/json'
+  //     }})
+  //   .then (res => {
+  //     console.log("set successfully", res.json())
+  //   })
+  // }

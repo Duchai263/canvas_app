@@ -58,11 +58,12 @@
           </label>
           <div class="detectOnClick hidden" id="detectOnClick" >
             <img id="segment-image" src="#" alt="Preview" class="hidden">
+            
             <canvas class="canvas-segmentation" id = "canvas-segmentation"></canvas>
             <span class="click-point"></span>
           </div>
           <canvas id="myCanvas" ></canvas>
-
+          <input type="range" min="1" max="20" value="10" id="penSizeSlider">
           <img id="uploadedImage" class = "hidden">
           <div id="response" class="hidden">
             <div id="messages"></div>

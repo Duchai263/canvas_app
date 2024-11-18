@@ -64,6 +64,9 @@
 	width:0;
 	height: 0;
 }
+#penSizeSlider{
+	display: none;
+}
 #invisibleCanvas {
 	/* display: none;/ */
 }

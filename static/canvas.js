@@ -1,23 +1,29 @@
 let invCanvas = document.createElement('canvas');
-var link = document.createElement('a');
+let invCanvas_seg = document.createElement('canvas');
 let mode = "";
 let check_upload = 0;
 let globalheight = 0;
 let globalwidth = 0;
-window.onload = function () {
+let diddraw = 0;
+window.onload = async function () {
     document.getElementById('btn-draw').onclick = () => {
       upload();
     }
     mode = "drawing";
-    document.getElementById('btn-segment').onclick = () => {
+    document.getElementById('btn-segment').onclick = async () => {
       if (mode === "drawing")
       {
-        var img = document.getElementById('file-image')
-        globalwidth = img.width;
-        globalheight = img.height;
         mode = "segment";
+        var img = document.getElementById('file-image')
+        if (check_upload === 0)
+        {
+          globalwidth = img.width;
+          globalheight = img.height;
+          await upload()
+        }
         let segment_mode = document.getElementById('segment-image');
         document.getElementById("myCanvas").style.display = "none";
+        document.getElementById("penSizeSlider").style.display = "none";
         document.getElementById("detectOnClick").classList.remove('hidden');
         segment_mode.src = document.getElementById("file-image").src;
         segment_mode.style = document.getElementById("file-image").style;
@@ -29,15 +35,22 @@ window.onload = function () {
       }
       else if (mode === "segment")
       {
+        mode = "drawing";
         if (check_upload === 1){
-          mode = "drawing";
-          document.getElementById("myCanvas").style.display = "block"
-          document.getElementById("detectOnClick").classList.add('hidden')
+          document.getElementById("myCanvas").style.display = "block";
+          document.getElementById("penSizeSlider").style.display = "block";
+          document.getElementById("detectOnClick").classList.add('hidden');
         }
         else{
-          upload();
-          document.getElementById("myCanvas").style.display = "block"
-          document.getElementById("detectOnClick").classList.add('hidden')
+          await upload();
+          document.getElementById("myCanvas").style.display = "block";
+          document.getElementById("penSizeSlider").style.display = "block";
+          document.getElementById("detectOnClick").classList.add('hidden');
+        }
+        if (diddraw === 0)
+        {
+          draw()
+          diddraw = 1;
         }
         document.getElementById("btn-segment").textContent = "Segmentation";
       }
@@ -48,17 +61,27 @@ let imagefile;
 
 async function upload (){
   var img = document.getElementById('file-image')
+  if (mode === "drawing")
+  {
+    document.getElementById("penSizeSlider").style.display = "block";
+    document.getElementById("detectOnClick").classList.add('hidden')
+  }
   if (globalheight === 0)
   {
     globalwidth = img.width;
     globalheight = img.height;
   }
-  check_upload = 1;
+
   var img_name = document.getElementById('message')
   var canvas = document.getElementById('myCanvas');
-  document.getElementById("detectOnClick").classList.add('hidden')
-
-
+  let ctx = canvas.getContext('2d');
+          canvas.style.width = "100%";
+          canvas.style.height = "100%";
+          canvas.width = globalwidth;
+          canvas.height = globalheight; 
+          img.style.display = 'none';
+          // Draw the image on the canvas
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
   let canvas_img = canvas.toDataURL();
 
   await fetch('/upload_img', {
@@ -72,24 +95,17 @@ async function upload (){
 .then(data => {
     if (data.message === 'oke')
     {
-      // let canvas = document.getElementById("myCanvas");
-      let ctx = canvas.getContext('2d');
-
+      check_upload = 1;
       if (img && ctx) {
-            // Set the canvas size to match the image
-            // document.getElementById('file-drag').style.height = 0; 
-            document.getElementById('file-drag').style.pointerEvents = "none";
+        if(mode === "drawing")
+        {
+          document.getElementById('file-drag').style.pointerEvents = "none";
 
-            canvas.style.width = "100%";
-            canvas.style.height = "100%";
-            canvas.width = globalwidth;
-            canvas.height = globalheight; 
-            img.style.display = 'none';
-            // Draw the image on the canvas
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            draw()
-            save_mode()
-            document.getElementById('file-drag').style.display = "none";
+          draw()
+          save_mode()
+          document.getElementById('file-drag').style.display = "none";
+        }
+            // Set the canvas size to match the image
     }
     }
 })
@@ -110,6 +126,7 @@ function save_mode (){
               if (mode === "drawing")
               {
                 canvas.style.display = "none";
+                document.getElementById('penSizeSlider').style.display = "none";
               }
               else if (mode === "segment"){
                 document.getElementById('detectOnClick').style.display = "none";
@@ -120,10 +137,6 @@ function save_mode (){
 function draw() {
 
     let canvas = document.getElementById('myCanvas');
-    // invCanvas.classList.remove("hidden");
-    // // document.getElementById('drawing-content').classList.remove("hidden");
-    // // document.getElementById('btn-draw').textContent = 'Draw again'; 
-
     let ctx = canvas.getContext('2d');
     if (ctx) {
         invCanvas.width = canvas.width;
@@ -131,7 +144,13 @@ function draw() {
         var ctx2 = invCanvas.getContext('2d');
         ctx2.fillStyle='black';
         ctx2.fillRect(0,0,canvas.width,canvas.height);
+        var penSizeSlider = document.getElementById('penSizeSlider');
+        var penSize = parseInt(penSizeSlider.value);
 
+        penSizeSlider.addEventListener('input', function() {
+            penSize = parseInt(penSizeSlider.value);
+            console.log(penSize)
+        });
     // Start painting
 
     var painting = false;
@@ -155,7 +174,7 @@ function draw() {
     canvas.addEventListener('mousemove', async function (event) {
         if (!painting) return;
 
-        ctx.lineWidth = 10;
+        ctx.lineWidth = penSize;
         ctx.lineCap = 'round';
         ctx.strokeStyle = 'red';
         
@@ -191,7 +210,8 @@ function draw() {
     }
     else if (mode === "segment")
     {
-      imageData = document.getElementById('canvas-segmentation').toDataURL()
+      // imageData = document.getElementById('canvas-segmentation').toDataURL()
+      imageData = invCanvas_seg.toDataURL();
     }
 
     await fetch('/download_canvas', {
@@ -222,21 +242,8 @@ function ekUpload(){
     
     //(1)
   
-      var fileSelect    = document.getElementById('file-upload'),
-          fileDrag      = document.getElementById('file-drag'),
-          submitButton  = document.getElementById('submit-button');
-
-
-          //(2)
+      var fileSelect    = document.getElementById('file-upload');
       fileSelect.addEventListener('change', fileSelectHandler, false);
-      // Is XHR2 available?
-      // var xhr = new XMLHttpRequest();
-      // if (xhr.upload) {
-      //   // File Drop
-      //   fileDrag.addEventListener('dragover', fileDragHover, false);
-      //   fileDrag.addEventListener('dragleave', fileDragHover, false);
-      //   fileDrag.addEventListener('drop', fileSelectHandler, false);
-      // }
     }
   
     function fileDragHover(e) {
@@ -297,13 +304,6 @@ function ekUpload(){
       }
     }
   
-    function setProgressMaxValue(e) {
-      var pBar = document.getElementById('file-progress');
-  
-      if (e.lengthComputable) {
-        pBar.max = e.total;
-      }
-    }
   
     function updateFileProgress(e) {
       var pBar = document.getElementById('file-progress');
@@ -311,42 +311,6 @@ function ekUpload(){
       if (e.lengthComputable) {
         pBar.value = e.loaded;
 
-      }
-    }
-  //(5)
-    function uploadFile(file) {
-  
-      var xhr = new XMLHttpRequest(),
-        fileInput = document.getElementById('class-roster-file'),
-        pBar = document.getElementById('file-progress'),
-        fileSizeLimit = 1024; // In MB
-      if (xhr.upload) {
-        // Check if file is less than x MB
-        if (file.size <= fileSizeLimit * 1024 * 1024) {
-          // Progress bar
-          pBar.style.display = 'inline';
-          xhr.upload.addEventListener('loadstart', setProgressMaxValue, true);
-          xhr.upload.addEventListener('progress', updateFileProgress, true);
-  
-          // File received / failed
-          xhr.onreadystatechange = function(e) {
-            if (xhr.readyState == 4) {
-              // Everything is good!
-  
-              // progress.className = (xhr.status == 200 ? "success" : "failure");
-              // document.location.reload(true);
-            }
-          };
-  
-          // Start upload
-          xhr.open('POST', document.getElementById('file-upload-form').action, true);
-          xhr.setRequestHeader('X-File-Name', file.name);
-          xhr.setRequestHeader('X-File-Size', file.size);
-          xhr.setRequestHeader('Content-Type', 'multipart/form-data');
-          xhr.send(file);
-        } else {
-          output('Please upload a smaller file (< ' + fileSizeLimit + ' MB).');
-        }
       }
     }
   
@@ -397,31 +361,6 @@ function ekUpload(){
   // CSS class 'detectionOnClick'. Lets get all the elements that have
   // this class.
   const imageContainers = document.getElementsByClassName("detectOnClick")
-  const uploadFile = document.getElementById("uploadFile")
-  const imageUpload = document.getElementById("imageUpload")
-  
-  // Handle the upload file event
-  uploadFile.addEventListener("change", uploadedImage, false)
-  
-  function uploadedImage(event) {
-    const reader = new FileReader()
-    reader.onload = function() {
-      const src = reader.result
-      imageUpload.src = src
-      imageUpload.style.display = "block"
-      const canvas = imageUpload.parentElement.getElementsByClassName(
-        "canvas-segmentation"
-      )[0]
-      const ctx = canvas.getContext("2d")
-  
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-      const clickPoint = imageUpload.parentElement.getElementsByClassName(
-        "click-point"
-      )[0]
-      clickPoint.style.display = "none"
-    }
-    reader.readAsDataURL(event.target.files[0])
-  }
   
   // Handle clicks on the demo images
   for (let i = 0; i < imageContainers.length; i++) {
@@ -436,7 +375,7 @@ function ekUpload(){
       alert("InteractiveSegmenter still loading. Try again shortly.")
       return
     }
-    console.log (event.target.height)
+    console.log (event.target)
     interactiveSegmenter.segment(
       event.target,
       {
@@ -456,12 +395,17 @@ function ekUpload(){
    * Draw segmentation result
    */
   function drawSegmentation(mask, targetElement) {
+    // result of API for sementation
     const width = mask.width
     const height = mask.height
     const maskData = mask.getAsFloat32Array()
+    //drawing mask
+
     const canvas = targetElement.getElementsByClassName("canvas-segmentation")[0]
     canvas.width = width
     canvas.height = height
+    invCanvas_seg.width = width
+    invCanvas_seg.height = height
   
     console.log("Start visualization")
   
@@ -469,12 +413,18 @@ function ekUpload(){
     ctx.fillStyle = "#00000000"
     ctx.fillRect(0, 0, width, height)
     ctx.fillStyle = "rgba(0, 0, 0, 0.7)"
-  
+
+    const ctx2 = invCanvas_seg.getContext("2d")
+    ctx2.fillStyle = "#fffffff"
+    ctx2.fillRect(0, 0, width, height)
+    ctx2.fillStyle = "rgba(255, 255, 255)"
+    
     maskData.map((category, index) => {
       if (Math.round(category * 255.0) === 0) {
         const x = (index + 1) % width
         const y = (index + 1 - x) / width
         ctx.fillRect(x, y, 1, 1)
+        ctx2.fillRect(x, y, 1, 1)
       }
     })
   }

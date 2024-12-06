@@ -1,3 +1,4 @@
 static/uploads/
 static/results/
 venv/
+__pycache__/

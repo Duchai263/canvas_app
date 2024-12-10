@@ -74,7 +74,6 @@ async function upload (){
     globalheight = img.height;
   }
 
-  var img_name = document.getElementById('message')
   var canvas = document.getElementById('myCanvas');
   let ctx = canvas.getContext('2d');
           canvas.style.width = "100%";
@@ -86,7 +85,7 @@ async function upload (){
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
   let canvas_img = canvas.toDataURL();
   ////////////////////////////////////////////////
-  // await setImage()
+  await setImage(canvas,imagefile.name);
   ////////////////////////////////////////////////
   await fetch('/upload_img', {
     method: 'POST',
@@ -153,7 +152,6 @@ function draw() {
 
         penSizeSlider.addEventListener('input', function() {
             penSize = parseInt(penSizeSlider.value);
-            console.log(penSize)
         });
     // Start painting
 
@@ -311,14 +309,6 @@ function ekUpload(){
     }
   
   
-    function updateFileProgress(e) {
-      var pBar = document.getElementById('file-progress');
-  
-      if (e.lengthComputable) {
-        pBar.value = e.loaded;
-
-      }
-    }
   
     // Check for the various File API support.
     if (window.File && window.FileList && window.FileReader) {
@@ -329,37 +319,37 @@ function ekUpload(){
   }
   ekUpload();
 
-  import {
-    InteractiveSegmenter,
-    FilesetResolver
-  } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0"
+  // import {
+  //   InteractiveSegmenter,
+  //   FilesetResolver
+  // } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0"
   
   
-  let interactiveSegmenter
+  // let interactiveSegmenter
   
-  // Before we can use InteractiveSegmenter class we must wait for it to finish
-  // loading. Machine Learning models can be large and take a moment to
-  // get everything needed to run.
-  const createSegmenter = async () => {
-    const filesetResolver = await FilesetResolver.forVisionTasks(
-      "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm"
-    )
-    interactiveSegmenter = await InteractiveSegmenter.createFromOptions(
-      filesetResolver,
-      {
-        baseOptions: {
-          modelAssetPath: `https://storage.googleapis.com/mediapipe-models/interactive_segmenter/magic_touch/float32/1/magic_touch.tflite`,
-          delegate: "GPU"
-        },
-        outputCategoryMask: true,
-        outputConfidenceMasks: false
-      }
-    )
+  // // Before we can use InteractiveSegmenter class we must wait for it to finish
+  // // loading. Machine Learning models can be large and take a moment to
+  // // get everything needed to run.
+  // const createSegmenter = async () => {
+  //   const filesetResolver = await FilesetResolver.forVisionTasks(
+  //     "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm"
+  //   )
+  //   interactiveSegmenter = await InteractiveSegmenter.createFromOptions(
+  //     filesetResolver,
+  //     {
+  //       baseOptions: {
+  //         modelAssetPath: `https://storage.googleapis.com/mediapipe-models/interactive_segmenter/magic_touch/float32/1/magic_touch.tflite`,
+  //         delegate: "GPU"
+  //       },
+  //       outputCategoryMask: true,
+  //       outputConfidenceMasks: false
+  //     }
+  //   )
     /////////////////////////////////////////////////////
     // await setImage()
     /////////////////////////////////////////////////////
-  }
-  createSegmenter()
+  // }
+  // createSegmenter()
   
   /********************************************************************
    // Demo 1: Grab a bunch of images from the page and detection them
@@ -369,47 +359,62 @@ function ekUpload(){
   // In this demo, we have put all our clickable images in divs with the
   // CSS class 'detectionOnClick'. Lets get all the elements that have
   // this class.
-  const imageContainers = document.getElementsByClassName("detectOnClick")
+  // const imageContainers = document.getElementsByClassName("detectOnClick")
   
-  // Handle clicks on the demo images
-  for (let i = 0; i < imageContainers.length; i++) {
-    imageContainers[i].children[0].addEventListener("click", handleClick)
-  }
+  // // Handle clicks on the demo images
+  // for (let i = 0; i < imageContainers.length; i++) {
+  //   imageContainers[i].children[0].addEventListener("click", handleClick)
+  // }
   
-  /**
-   * Detect segmentation on click
-   */
-  async function handleClick(event) {
-    if (!interactiveSegmenter) {
-      alert("InteractiveSegmenter still loading. Try again shortly.")
-      return
-    }
-    ////////////////////////////////////////////////////////////
-    await click(event.offsetX / event.target.width, event.offsetY / event.target.height)
-    ////////////////////////////////////////////////////////////
-    interactiveSegmenter.segment(
-      event.target,
-      {
-        keypoint: {
-          x: event.offsetX / event.target.width,
-          y: event.offsetY / event.target.height
-        }
-      },
-      result => {
-        drawSegmentation(result.categoryMask, event.target.parentElement)
-        drawClickPoint(event.target.parentElement, event)
-      }
-    )
-  }
-  
+  // /**
+  //  * Detect segmentation on click
+  //  */
+  // async function handleClick(event) {
+  //   if (!interactiveSegmenter) {
+  //     alert("InteractiveSegmenter still loading. Try again shortly.")
+  //     return
+  //   }
+  //   ////////////////////////////////////////////////////////////
+  //   await click(event.offsetX / event.target.width, event.offsetY / event.target.height)
+  //   ////////////////////////////////////////////////////////////
+  //   interactiveSegmenter.segment(
+  //     event.target,
+  //     {
+  //       keypoint: {
+  //         x: event.offsetX / event.target.width,
+  //         y: event.offsetY / event.target.height
+  //       }
+  //     },
+  //     result => {
+  //       drawSegmentation(result.categoryMask, event.target.parentElement)
+  //       drawClickPoint(event.target.parentElement, event)
+  //     }
+  //   )
+  // }
+/////////////////////////////////////////////
+async function handleClick(event) {
+  let x = event.offsetX
+  let y = event.offsetY
+
+  let mask = await click(x, y)
+  mask = eval(mask)
+  console.log(typeof(mask))
+  console.log(mask.length)
+  console.log(mask[0].length)
+
+  drawSegmentation(mask, event.target.parentElement)
+  drawClickPoint(event.target.parentElement, event)
+}
+/////////////////////////////////////////////
   /**
    * Draw segmentation result
    */
   function drawSegmentation(mask, targetElement) {
-    // result of API for sementation
-    const width = mask.width
-    const height = mask.height
-    const maskData = mask.getAsFloat32Array()
+
+    const width = mask[0].length
+    const height = mask.length
+    console.log(mask[0][0])
+    // const maskData = mask.getAsFloat32Array()
     //drawing mask
 
     const canvas = targetElement.getElementsByClassName("canvas-segmentation")[0]
@@ -417,8 +422,6 @@ function ekUpload(){
     canvas.height = height
     invCanvas_seg.width = width
     invCanvas_seg.height = height
-  
-    console.log("Start visualization")
   
     const ctx = canvas.getContext("2d")
     ctx.fillStyle = "#00000000"
@@ -429,15 +432,22 @@ function ekUpload(){
     ctx2.fillStyle = "#fffffff"
     ctx2.fillRect(0, 0, width, height)
     ctx2.fillStyle = "rgba(255, 255, 255)"
-    
-    maskData.map((category, index) => {
-      if (Math.round(category * 255.0) === 0) {
-        const x = (index + 1) % width
-        const y = (index + 1 - x) / width
-        ctx.fillRect(x, y, 1, 1)
-        ctx2.fillRect(x, y, 1, 1)
-      }
-    })
+
+    for (let i=0; i<mask.length;i++)
+      for (let j=0;j<mask[0].length;j++)
+        if (mask[i][j]) {
+          ctx.fillRect(j,i,1,1)
+          ctx2.fillRect(j,i,1,1)
+        }
+
+    // maskData.map((category, index) => {
+    //   if (Math.round(category * 255.0) === 0) {
+    //     const x = (index + 1) % width
+    //     const y = (index + 1 - x) / width
+    //     ctx.fillRect(x, y, 1, 1)
+    //     ctx2.fillRect(x, y, 1, 1)
+    //   }
+    // })
   }
   
   /**
@@ -449,20 +459,3 @@ function ekUpload(){
     clickPoint.style.left = `${event.offsetX - 8}px`
     clickPoint.style.display = "block"
   }
-  
-  // async function setImage() {
-  //   const APIurl = 'http://localhost:5959/setimage/'
-
-  //   let canvas = document.getElementById('myCanvas');
-  //   let imageData = canvas.toDataURL()
-
-  //   await fetch(APIurl, {
-  //     method: 'POST',
-  //     body: JSON.stringify({ image_data: imageData, name: imagefile.name }),
-  //     headers: {
-  //         'Content-Type': 'application/json'
-  //     }})
-  //   .then (res => {
-  //     console.log("set successfully", res.json())
-  //   })
-  // }

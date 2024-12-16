@@ -27,6 +27,7 @@ window.onload = async function () {
       let segment_mode = document.getElementById('segment-image');
       document.getElementById("myCanvas").style.display = "none";
       document.getElementById("penSizeSlider").style.display = "none";
+      document.getElementById("btn-undo").style.display = "none";
       document.getElementById("detectOnClick").classList.remove('hidden');
       segment_mode.src = document.getElementById("file-image").src;
       segment_mode.style = document.getElementById("file-image").style;
@@ -43,12 +44,14 @@ window.onload = async function () {
       mode = "drawing";
       if (check_upload === 1) {
         document.getElementById("myCanvas").style.display = "block";
+        document.getElementById("btn-undo").style.display = "block";
         document.getElementById("penSizeSlider").style.display = "block";
         document.getElementById("detectOnClick").classList.add('hidden');
       }
       else {
         await upload();
         document.getElementById("myCanvas").style.display = "block";
+        document.getElementById("btn-undo").style.display = "block";
         document.getElementById("penSizeSlider").style.display = "block";
         document.getElementById("detectOnClick").classList.add('hidden');
       }
@@ -67,13 +70,14 @@ async function upload() {
   var img = document.getElementById('file-image')
   if (mode === "drawing") {
     document.getElementById("penSizeSlider").style.display = "block";
+    document.getElementById("btn-undo").style.display = "block";
     document.getElementById("detectOnClick").classList.add('hidden')
   }
   if (globalheight === 0) {
     globalwidth = img.width;
     globalheight = img.height;
   }
-
+  
   var canvas = document.getElementById('myCanvas');
   let ctx = canvas.getContext('2d');
   canvas.style.width = "100%";

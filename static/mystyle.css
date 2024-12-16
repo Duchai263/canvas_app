@@ -63,6 +63,15 @@
 	position: absolute;
     margin: 10px;
 }
+
+#btn-undo{
+	background-color: transparent;
+	height: 30px;
+	width: 30px;
+	display: none;
+	
+}
+
 #myCanvas {
 	/* border: 1px solid black; */
 	display: inline;

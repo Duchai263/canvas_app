@@ -3,6 +3,7 @@ import { setImage, click, inpainting } from './segmentAPI.js'
 let invCanvas = document.createElement('canvas');
 let invCanvas_seg = document.createElement('canvas');
 let imgHolder = document.createElement('canvas');
+const history = [];
 let mode = "";
 let check_upload = 0;
 let globalheight = 0;
@@ -22,6 +23,7 @@ window.onload = async function () {
         globalheight = img.height;
         await upload()
       }
+
       let segment_mode = document.getElementById('segment-image');
       document.getElementById("myCanvas").style.display = "none";
       document.getElementById("penSizeSlider").style.display = "none";
@@ -121,19 +123,6 @@ async function upload() {
 function save_mode() {
   document.getElementById('btn-draw').textContent = "Remove"
   document.getElementById('btn-draw').onclick = () => {
-    // let canvas = document.getElementById("myCanvas");
-    // save()
-    // let img_result = document.getElementById('uploadedImage');
-    // img_result.style.width = "100%";
-    // img_result.style.height = "100%";
-    // img_result.classList.remove("hidden");
-    // if (mode === "drawing") {
-    //   canvas.style.display = "none";
-    //   document.getElementById('penSizeSlider').style.display = "none";
-    // }
-    // else if (mode === "segment") {
-    //   document.getElementById('detectOnClick').style.display = "none";
-    // }
 
     if (mode === "drawing") {
       let canvas = document.getElementById("myCanvas");
@@ -212,44 +201,9 @@ function draw() {
   }
 }
 
-async function save() {
 
-  let imageData;
-  // if (mode === "drawing") {
-  //   imageData = invCanvas.toDataURL();
-  // }
-  // else if (mode === "segment") {
-  //   // imageData = document.getElementById('canvas-segmentation').toDataURL()
-  //   imageData = invCanvas_seg.toDataURL();
-  // }
-
-  // // await fetch('/download_canvas', {
-  // //   method: 'POST',
-  // //   body: JSON.stringify({ image_data: imageData, name: imagefile.name }),
-  // //   headers: {
-  // //     'Content-Type': 'application/json'
-  // //   }
-  // // })
-  // //   .then(response => response.json())
-  // //   .then(data => {
-  // //     if (data.message === 'oke') {
-  // //       document.getElementById('uploadedImage').src = data.img_name;
-  // //     }
-  // //   })
-  // //   .catch(error => {
-  // //     console.error('Error:', error);
-  // //   });
-}
-
-// image upload 
-
-// File Upload
-// 
 function ekUpload() {
   function Init() {
-
-    //(1)
-
     var fileSelect = document.getElementById('file-upload');
     fileSelect.addEventListener('change', fileSelectHandler, false);
   }
@@ -262,9 +216,7 @@ function ekUpload() {
 
     fileDrag.className = (e.type === 'dragover' ? 'hover' : 'modal-body file-upload');
   }
-  //(3)
   function fileSelectHandler(e) {
-    // Fetch FileList object
     var files = e.target.files || e.dataTransfer.files;
 
     // Cancel event and hover styling
@@ -272,10 +224,7 @@ function ekUpload() {
 
     // Process all File objects
     for (var i = 0, f; f = files[i]; i++) {
-      //(4)
       parseFile(f);
-      //(5)
-      // uploadFile(f);
     }
   }
 
@@ -313,9 +262,6 @@ function ekUpload() {
 
 
   }
-
-
-
   // Check for the various File API support.
   if (window.File && window.FileList && window.FileReader) {
     Init();
@@ -325,79 +271,6 @@ function ekUpload() {
 }
 ekUpload();
 
-// import {
-//   InteractiveSegmenter,
-//   FilesetResolver
-// } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0"
-
-
-// let interactiveSegmenter
-
-// // Before we can use InteractiveSegmenter class we must wait for it to finish
-// // loading. Machine Learning models can be large and take a moment to
-// // get everything needed to run.
-// const createSegmenter = async () => {
-//   const filesetResolver = await FilesetResolver.forVisionTasks(
-//     "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm"
-//   )
-//   interactiveSegmenter = await InteractiveSegmenter.createFromOptions(
-//     filesetResolver,
-//     {
-//       baseOptions: {
-//         modelAssetPath: `https://storage.googleapis.com/mediapipe-models/interactive_segmenter/magic_touch/float32/1/magic_touch.tflite`,
-//         delegate: "GPU"
-//       },
-//       outputCategoryMask: true,
-//       outputConfidenceMasks: false
-//     }
-//   )
-/////////////////////////////////////////////////////
-// await setImage()
-/////////////////////////////////////////////////////
-// }
-// createSegmenter()
-
-/********************************************************************
- // Demo 1: Grab a bunch of images from the page and detection them
- // upon click.
- ********************************************************************/
-
-// In this demo, we have put all our clickable images in divs with the
-// CSS class 'detectionOnClick'. Lets get all the elements that have
-// this class.
-// const imageContainers = document.getElementsByClassName("detectOnClick")
-
-// // Handle clicks on the demo images
-// for (let i = 0; i < imageContainers.length; i++) {
-//   imageContainers[i].children[0].addEventListener("click", handleClick)
-// }
-
-// /**
-//  * Detect segmentation on click
-//  */
-// async function handleClick(event) {
-//   if (!interactiveSegmenter) {
-//     alert("InteractiveSegmenter still loading. Try again shortly.")
-//     return
-//   }
-//   ////////////////////////////////////////////////////////////
-//   await click(event.offsetX / event.target.width, event.offsetY / event.target.height)
-//   ////////////////////////////////////////////////////////////
-//   interactiveSegmenter.segment(
-//     event.target,
-//     {
-//       keypoint: {
-//         x: event.offsetX / event.target.width,
-//         y: event.offsetY / event.target.height
-//       }
-//     },
-//     result => {
-//       drawSegmentation(result.categoryMask, event.target.parentElement)
-//       drawClickPoint(event.target.parentElement, event)
-//     }
-//   )
-// }
-/////////////////////////////////////////////
 async function handleClick(event) {
   let x = event.offsetX
   let y = event.offsetY
@@ -445,15 +318,6 @@ function drawSegmentation(mask, targetElement) {
         ctx.fillRect(j, i, 1, 1)
         ctx2.fillRect(j, i, 1, 1)
       }
-
-  // maskData.map((category, index) => {
-  //   if (Math.round(category * 255.0) === 0) {
-  //     const x = (index + 1) % width
-  //     const y = (index + 1 - x) / width
-  //     ctx.fillRect(x, y, 1, 1)
-  //     ctx2.fillRect(x, y, 1, 1)
-  //   }
-  // })
 }
 
 /**

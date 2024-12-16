@@ -83,13 +83,13 @@ async function upload() {
   img.style.display = 'none';
   // Draw the image on the canvas
   ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  history.push(  ctx.getImageData(0, 0, canvas.width, canvas.height))
   
   /// Draw image on holder
   imgHolder.width = globalwidth
   imgHolder.height = globalheight
   let ctxHolder = imgHolder.getContext('2d')
-  ctxHolder.drawImage(img, 0, 0, canvas.width, canvas.height);
-  
+  ctxHolder.drawImage(img, 0, 0, canvas.width, canvas.height)
   let canvas_img = canvas.toDataURL();
 
   await fetch('/upload_img', {
@@ -159,20 +159,31 @@ function draw() {
     ctx2.globalAlpha = 1;
     ctx2.imageSmoothingEnabled = false;
     // Draw the uploaded image onto the canvas once it loads
-    canvas.addEventListener('mousedown', async function () {
+    canvas.addEventListener('mousedown', async function (e) {
       painting = true;
+      ctx.beginPath();
+      ctx.moveTo(e.offsetX, e.offsetY);
+      ctx2.beginPath();
+      ctx2.moveTo(e.offsetX, e.offsetY);
     });
 
     // Stop painting
     canvas.addEventListener('mouseup', async function () {
-      painting = false;
-      ctx.beginPath(); // Reset the path after each stroke
-      ctx2.beginPath();
+      if (painting)
+      {
+        ctx.closePath();
+        // ctx2.closePath();
+        history.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+        painting = false;
+      }
+      // painting = false;
+      // ctx.beginPath(); // Reset the path after each stroke
+      // ctx2.beginPath();
     });
 
     // Drawing logic
-    canvas.addEventListener('mousemove', async function (event) {
-      if (!painting) return;
+    canvas.addEventListener('mousemove', async function (e) {
+    //   if (!painting) return;
 
       ctx.lineWidth = penSize;
       ctx.lineCap = 'round';
@@ -182,21 +193,42 @@ function draw() {
       ctx2.lineCap = 'round';
       ctx2.strokeStyle = '#FFFFFF';
 
-      // Adjust mouse coordinates to canvas offset
-      var rect = canvas.getBoundingClientRect();
-      var x = event.clientX - rect.left;
-      var y = event.clientY - rect.top;
+    //   // Adjust mouse coordinates to canvas offset
+    //   var rect = canvas.getBoundingClientRect();
+    //   var x = event.clientX - rect.left;
+    //   var y = event.clientY - rect.top;
 
-      ctx2.lineTo(x, y);
-      ctx2.stroke();
-      ctx2.beginPath();
-      ctx2.moveTo(x, y);
+    //   ctx2.lineTo(x, y);
+    //   ctx2.stroke();
+    //   ctx2.beginPath();
+    //   ctx2.moveTo(x, y);
 
-      ctx.lineTo(x, y);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(x, y);
+    //   ctx.lineTo(x, y);
+    //   ctx.stroke();
+    //   ctx.beginPath();
+    //   ctx.moveTo(x, y);
+        if (painting) {
+          ctx.lineTo(e.offsetX, e.offsetY);
+          ctx.stroke();
+      }
     });
+    document.getElementById('btn-undo').addEventListener('click', undo)
+    function undo() {
+      if (history.length > 0) {
+        if (history.length == 1)
+        {
+          return;
+        }
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+          console.log(history.length)
+          history.pop(); // Remove the last drawing from history
+
+          // Redraw the remaining history
+          history.forEach(item => {
+              ctx.putImageData(item, 0, 0);
+          });
+      }
+  }
 
   }
 }

@@ -14,6 +14,29 @@ window.onload = async function () {
     upload();
   }
   mode = "drawing";
+  document.getElementById('btn-show-original').onclick = () =>{
+    if (document.getElementById('btn-show-original').textContent === "Show Original")
+    {
+      document.getElementById('original-container').style.display = 'block';
+      document.getElementById('btn-show-original').textContent = "Close Original";
+    }else
+    {
+      document.getElementById('original-container').style.display = 'none';
+      document.getElementById('btn-show-original').textContent = "Show Original";
+    }
+  }
+
+  document.getElementById('btn-show-masked').onclick = () => {
+    if (document.getElementById('btn-show-masked').textContent === "Show Masked")
+    {
+      document.getElementById('masked-container').style.display = 'block';
+      document.getElementById('btn-show-masked').textContent = "Close Masked";
+    }else
+    {
+      document.getElementById('masked-container').style.display = 'none';
+      document.getElementById('btn-show-masked').textContent = "Show Masked";
+    }
+  }
   document.getElementById('btn-segment').onclick = async () => {
     if (mode === "drawing") {
       mode = "segment";
@@ -67,6 +90,7 @@ window.onload = async function () {
 let imagefile;
 
 async function upload() {
+  console.log ("upload function")
   var img = document.getElementById('file-image')
   if (mode === "drawing") {
     document.getElementById("penSizeSlider").style.display = "block";
@@ -77,7 +101,7 @@ async function upload() {
     globalwidth = img.width;
     globalheight = img.height;
   }
-  
+
   var canvas = document.getElementById('myCanvas');
   let ctx = canvas.getContext('2d');
   canvas.style.width = "100%";
@@ -125,22 +149,77 @@ async function upload() {
 }
 
 function save_mode() {
+    console.log ("save_mode function")
   document.getElementById('btn-draw').textContent = "Remove"
   document.getElementById('btn-draw').onclick = () => {
-
     if (mode === "drawing") {
+      console.log ("save_mode drawing function")
       let canvas = document.getElementById("myCanvas");
       inpainting(imgHolder,invCanvas,canvas)
+      // let resize_can = resizeCanvas(invCanvas,600,350,800,450)
+      document.getElementById("masked-container").appendChild(invCanvas);
+      invCanvas.style.display = "block"
+      var newDiv = document.createElement("div");
+      newDiv.className = "centered-text"; // Gán lớp CSS để căn giữa văn bản
+
+      // Đặt văn bản cho thẻ div
+      var textNode = document.createTextNode("Masked Image");
+      newDiv.appendChild(textNode); 
+      document.getElementById("masked-container").appendChild(newDiv);
     }
     else if (mode === "segment") {
+      console.log ("save_mode segment function")
       let canvas_seg = document.getElementById('canvas-segmentation')
       inpainting(imgHolder,invCanvas_seg,canvas_seg)
+
+
+      // let resize_can = resizeCanvas(invCanvas_seg,600,350,800,450)
+      document.getElementById("masked-container").appendChild(invCanvas_seg);
+      invCanvas_seg.style.display = "block"
+      var newDiv = document.createElement("div");
+      newDiv.className = "centered-text"; // Gán lớp CSS để căn giữa văn bản
+
+      // Đặt văn bản cho thẻ div
+      var textNode = document.createTextNode("Masked Image");
+      newDiv.appendChild(textNode); 
+      document.getElementById("masked-container").appendChild(newDiv);
     }
+    document.getElementById('btn-segment').style.display = 'none';
+    document.getElementById('btn-show-original').style.display = 'block';
+    document.getElementById('btn-show-masked').style.display = 'block';
+    // let resize_can = resizeCanvas(imgHolder,600,350,800,450)
+    document.getElementById("original-container").appendChild(imgHolder);
+    imgHolder.style.display = "block"
+    var newDiv = document.createElement("div");
+    newDiv.className = "centered-text"; // Gán lớp CSS để căn giữa văn bản
+
+    // Đặt văn bản cho thẻ div
+    var textNode = document.createTextNode("Original Image");
+    newDiv.appendChild(textNode); 
+    document.getElementById("original-container").appendChild(newDiv);
   }
 }
 
-function draw() {
+function resizeCanvas(canvas_in, newWidth, newHeight, oldwidth, oldheight ) {
+  // Luu hinh ve hien tai
+  let ctx_in = canvas_in.getContext('2d')
+  const imageData = ctx_in.getImageData(0, 0, oldwidth, oldheight);
 
+  // Cai dat kich thuoc moi cho canvas
+  let canvas_out = document.createElement('canvas');
+  let ctx_out = canvas_out.getContext('2d')
+  canvas_out.width = newWidth;
+  canvas_out.height = newHeight;
+
+  // Ve lai hinh voi kich thuoc moi
+
+  ctx_out.putImageData(imageData, 0, 0);
+  return canvas_out;
+}
+
+
+function draw() {
+  console.log ("draw function")
   let canvas = document.getElementById('myCanvas');
   let ctx = canvas.getContext('2d');
   if (ctx) {
@@ -176,7 +255,7 @@ function draw() {
       if (painting)
       {
         ctx.closePath();
-        // ctx2.closePath();
+        ctx2.closePath();
         history.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
         painting = false;
       }
@@ -193,7 +272,7 @@ function draw() {
       ctx.lineCap = 'round';
       ctx.strokeStyle = 'red';
 
-      ctx2.lineWidth = 10;
+      ctx2.lineWidth = penSize;
       ctx2.lineCap = 'round';
       ctx2.strokeStyle = '#FFFFFF';
 
@@ -214,6 +293,8 @@ function draw() {
         if (painting) {
           ctx.lineTo(e.offsetX, e.offsetY);
           ctx.stroke();
+          ctx2.lineTo(e.offsetX, e.offsetY);
+          ctx2.stroke();
       }
     });
     document.getElementById('btn-undo').addEventListener('click', undo)

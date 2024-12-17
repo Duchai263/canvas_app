@@ -38,9 +38,9 @@
 
 
     		
-    <div style="height:570px">
+    <div>
       <div id="file-upload-form" class="uploader">
-        <div class = "upload-form-container">
+        <div class = "upload-form-container" id = "upload-form-container">
           <input id="file-upload" type="file" name="image" accept="image/*" />
   
           <label for="file-upload" id="file-drag" class = "flex-center">
@@ -69,7 +69,7 @@
             </div>
             <canvas id="myCanvas" ></canvas>
           </div>
-          <input type="range" min="1" max="20" value="10" id="penSizeSlider">
+          <input type="range" min="1" max="30" value="15" id="penSizeSlider">
 
           <img id="uploadedImage" class = "hidden">
           <div id="response" class="hidden">
@@ -81,8 +81,18 @@
           <div id="submit-btn-container" >
             <button id="btn-draw" class="submit-btn">Draw Mask</button>
             <button id="btn-segment" class="submit-btn" >Segmentation</button>
+            <button id="btn-show-original" class="submit-btn">Show Original</button>
+            <button id="btn-show-masked" class="submit-btn" >Show Masked</button>
+          </div>
+
           </div>
         </div>
+      </div>
+      <div id = "more-info">
+        <div id = "masked-container"></div>  
+        <div id = "original-container"></div>  
+      </div>  
+      <div style = "height: 50px">
       </div>
     </div>
   </div>

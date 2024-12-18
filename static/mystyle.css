@@ -369,7 +369,8 @@ section {
 	display: none;
   }
   #more-info {
-	display: inline-block;
+	display: flex;
+	justify-content: center;
   }
 
   .centered-text {
@@ -386,5 +387,6 @@ section {
 	padding: 0;
 }
 #masked-container, #original-container {
-	display: none;
+	display: block;
+	margin: 10px;
 }

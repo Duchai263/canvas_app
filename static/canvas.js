@@ -14,29 +14,29 @@ window.onload = async function () {
     upload();
   }
   mode = "drawing";
-  document.getElementById('btn-show-original').onclick = () =>{
-    if (document.getElementById('btn-show-original').textContent === "Show Original")
-    {
-      document.getElementById('original-container').style.display = 'block';
-      document.getElementById('btn-show-original').textContent = "Close Original";
-    }else
-    {
-      document.getElementById('original-container').style.display = 'none';
-      document.getElementById('btn-show-original').textContent = "Show Original";
-    }
-  }
+  // document.getElementById('btn-show-original').onclick = () =>{
+  //   if (document.getElementById('btn-show-original').textContent === "Show Original")
+  //   {
+  //     document.getElementById('original-container').style.display = 'block';
+  //     document.getElementById('btn-show-original').textContent = "Close Original";
+  //   }else
+  //   {
+  //     document.getElementById('original-container').style.display = 'none';
+  //     document.getElementById('btn-show-original').textContent = "Show Original";
+  //   }
+  // }
 
-  document.getElementById('btn-show-masked').onclick = () => {
-    if (document.getElementById('btn-show-masked').textContent === "Show Masked")
-    {
-      document.getElementById('masked-container').style.display = 'block';
-      document.getElementById('btn-show-masked').textContent = "Close Masked";
-    }else
-    {
-      document.getElementById('masked-container').style.display = 'none';
-      document.getElementById('btn-show-masked').textContent = "Show Masked";
-    }
-  }
+  // document.getElementById('btn-show-masked').onclick = () => {
+  //   if (document.getElementById('btn-show-masked').textContent === "Show Masked")
+  //   {
+  //     document.getElementById('masked-container').style.display = 'block';
+  //     document.getElementById('btn-show-masked').textContent = "Close Masked";
+  //   }else
+  //   {
+  //     document.getElementById('masked-container').style.display = 'none';
+  //     document.getElementById('btn-show-masked').textContent = "Show Masked";
+  //   }
+  // }
   document.getElementById('btn-segment').onclick = async () => {
     if (mode === "drawing") {
       mode = "segment";
@@ -185,8 +185,6 @@ function save_mode() {
       document.getElementById("masked-container").appendChild(newDiv);
     }
     document.getElementById('btn-segment').style.display = 'none';
-    document.getElementById('btn-show-original').style.display = 'block';
-    document.getElementById('btn-show-masked').style.display = 'block';
     // let resize_can = resizeCanvas(imgHolder,600,350,800,450)
     document.getElementById("original-container").appendChild(imgHolder);
     imgHolder.style.display = "block"

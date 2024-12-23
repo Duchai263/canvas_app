@@ -195,7 +195,8 @@ h1{
 }
  .uploader #file-image, #segment-image {
 	 display: inline;
-	 margin: 0 auto 0.5rem auto;
+	 /* margin: 0 auto 0.5rem auto; */
+	 margin: 0 !important;
 	 width:100%;
 	 height: 100%;
 }
@@ -337,7 +338,8 @@ section {
 	float: left;
 	width: 100%;
 	height: 100%;
-	margin: 2% 1%;	
+	/* margin: 2% 1%;	 */
+	margin: 0 !important;
 	cursor: pointer;
   }
   .detectOnClick img {
@@ -347,8 +349,8 @@ section {
   
   .canvas-segmentation {
 	position: absolute;
-	width: 100%;
-	height: 100%;
+	/* width: 100%;
+	height: 100%; */
 	top: 0;
 	left: 0;
 	pointer-events: none;

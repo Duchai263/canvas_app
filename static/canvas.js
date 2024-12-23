@@ -412,6 +412,7 @@ function drawSegmentation(mask, targetElement) {
   //drawing mask
 
   const canvas = targetElement.getElementsByClassName("canvas-segmentation")[0]
+  console.log(width,height)
   canvas.width = width
   canvas.height = height
   invCanvas_seg.width = width

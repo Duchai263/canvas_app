@@ -1,4 +1,4 @@
-Object Removal Inpainting Tool
+# Object Removal Inpainting Tool
 
 # Installation  
 Before instal, create an virtual environment  

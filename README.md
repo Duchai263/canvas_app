@@ -24,6 +24,6 @@ Run LaMa api with
 `fastapi run .\api\inpaiting.py --port 5958`  
 and run the app with  
 `python app.py`  
-Now you can go to `http://localhost:8000/` and enjoy the tool
+Now you can go to `http://localhost:8000/` and enjoy the tool  
 (OPTIONAL) Using the segmentation feature with  
 `fastapi run .\api\segmentation.py --port 5959` 

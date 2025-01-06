@@ -66,8 +66,8 @@ def refine_mask(mask):
 @app.post('/inpainting/')
 async def inpainting(request: Request):
     image, mask = await read_image_from_request(request)
-    image.save("image.png")
-    mask.save("mask.png")
+    # image.save("image.png")
+    # mask.save("mask.png")
 
     mask = refine_mask(mask)
 
@@ -75,7 +75,7 @@ async def inpainting(request: Request):
 
 
     result = simple_lama(image, mask)
-    result.save("inpainted.png")
+    # result.save("inpainted.png")
     result_bytes = image_to_bytes(result)
     return Response(content=result_bytes,media_type=f"image/{result.format}")
     return {"message": "removed"}

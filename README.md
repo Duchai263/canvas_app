@@ -29,4 +29,5 @@ Now you can go to `http://localhost:8000/` and enjoy the tool
 `fastapi run .\api\segmentation.py --port 5959` 
 
 # ToDo  
-Docker
+Docker  
+Deploy

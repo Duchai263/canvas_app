@@ -1,0 +1,7 @@
+static/uploads/
+static/results/
+venv/
+__pycache__/
+.venv/
+my_venv/
+model_ckpt/

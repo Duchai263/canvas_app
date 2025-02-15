@@ -27,3 +27,7 @@ and run the app with
 Now you can go to `http://localhost:8000/` and enjoy the tool  
 (OPTIONAL) Using the segmentation feature with  
 `fastapi run .\api\segmentation.py --port 5959` 
+
+# ToDo  
+Docker  
+Deploy
